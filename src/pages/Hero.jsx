@@ -41,7 +41,6 @@ const Hero = (props) => {
         <Context contextRef={contextRef} showContext={showContext} setShowContext={setShowContext} position={contextPos} setShowTodo={props.setShowTodo} setShowBookmark={props.setShowBookmark} setShowSetting={props.setShowSetting}/>
         {props.iconsdisplay.weather && <Weather />}
         <aside className='absolute top-10 left-10 flex gap-10 select-none'>
-          {/* <Website /> */}
           {props.iconsdisplay.todo && <TodoButton setShowTodo={props.setShowTodo} />}
           {props.iconsdisplay.bookmark && <BookmarkButton setShowBookmark={props.setShowBookmark} />}
         </aside>

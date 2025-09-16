@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import React from 'react';
 import Background from './component/Background'
 import Hero from './pages/Hero'
 import Notification from './component/Notification'
