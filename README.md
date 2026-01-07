@@ -1,16 +1,68 @@
-<<<<<<< HEAD
-# React + Vite
+# Rica-Homepage 🌐
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![React](https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind-38B2AC?logo=tailwind-css&logoColor=white)
+![Framer Motion](https://img.shields.io/badge/Framer%20Motion-F24E1E?logo=framer&logoColor=white)
+![IndexedDB](https://img.shields.io/badge/IndexedDB-0078D7?logo=html5&logoColor=white)
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🔹 Overview
 
-## Expanding the ESLint configuration
+**Rica-Homepage** is a modern, customizable browser homepage built with React.  
+It transforms your new tab into a **personalized dashboard** with useful widgets and a clean design.  
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-=======
-# homepage-rica
->>>>>>> 1b7d6c45affe23ad95bde5effef8c5b931be3100
+Key functionalities include:
+- Weather display for your location.
+- Todo list creation and management.
+- Custom wallpapers (upload your own images).
+- Bookmark management synced with your browser.
+- Smooth animations using **Framer Motion** for interactive UI.
+- Fully responsive and minimalistic design for a clean browsing experience.
+
+---
+
+## 🔹 Screenshots
+
+| HomePage | Search Options |
+|-----------|-----------|
+| ![Screenshot 1](./screenshots/0.png) | ![Screenshot 2](./screenshots/1.png) | 
+| Bookmarks Page | Todo Page |
+| ![Screenshot 3](./screenshots/2.png) | ![Screenshot 4](./screenshots/3.png) |
+| Settings Page |  |
+| ![Screenshot 4](./screenshots/4.png) |  |
+
+
+---
+
+## 🔹 Features
+
+- **Custom Greeting:** Set your name to personalize the homepage.  
+- **Weather Widget:** Displays current weather based on your location.  
+- **Todo List:** Create, edit, and save todos locally.  
+- **Wallpaper Customization:** Upload your own images or choose from default backgrounds.  
+- **Bookmarks Tab:** View and access your synced browser bookmarks.  
+- **Smooth Animations:** Interactive UI transitions powered by **Framer Motion**.  
+- **IndexedDB Storage:** All custom wallpapers and todos are saved locally for persistent use.  
+- **Responsive Design:** Looks great on any screen size.  
+
+---
+
+## 🔹 Tech Stack
+
+- **Frontend:** React  
+- **Styling:** Tailwind CSS  
+- **Animations:** Framer Motion  
+- **Local Storage / DB:** IndexedDB via `idb`  
+- **Optional Libraries:**  
+  - react-icons  
+  - framer-motion  
+  - idb  
+
+---
+
+## 🔹 Installation
+
+1. Clone the repository:  
+```bash
+git clone https://github.com/prasad-pranay/homepage-rica.git
