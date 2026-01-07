@@ -37,6 +37,12 @@ function App() {
   const [iconsdisplay,setIconsDisplay] = useState({"none":null})
   const [background,setBackground] = useState("");
 
+  useEffect(() => {
+    if(background.length<3)return;
+    localStorage.setItem("background",background)
+  }, [background])
+  
+
     // {"todo":true,"bookmark":true,"setting":true,"weather":true})
 
 
@@ -77,9 +83,9 @@ function App() {
       <Background background={background} />
       <Hero notificationRef={notificationRef} setShowBookmark={setShowBookmark} setShowTodo={setShowTodo} iconsdisplay={iconsdisplay} setShowSetting={setShowSetting} />
       <Notification  ref={notificationRef} />
-      {showBookmark && <Bookmark setShowBookmark={setShowBookmark} notificationRef={notificationRef} />}
+       <Bookmark setShowBookmark={setShowBookmark} notificationRef={notificationRef} showBookmark={showBookmark} />
       {showTodo && <Todo setShowTodo={setShowTodo} notificationRef={notificationRef} />}
-      {showSetting && <Setting setIconsDisplay={setIconsDisplay} iconsdisplay={iconsdisplay} setBackground={setBackground} setShowSetting={setShowSetting} notificationRef={notificationRef} />}
+      <Setting setIconsDisplay={setIconsDisplay} iconsdisplay={iconsdisplay} setBackground={setBackground} setShowSetting={setShowSetting} notificationRef={notificationRef} showSetting={showSetting} />
     </>
   )
 }

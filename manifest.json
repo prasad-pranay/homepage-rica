@@ -2,15 +2,18 @@
   "manifest_version": 3,
   "name": "Rica",
   "version": "1.0",
-  "permissions": ["bookmarks"],
+  "permissions": ["bookmarks","history"],
   "description": "A personalized homepage with a modern UI and powerful features — created by Pranay.",
   "chrome_url_overrides": {
     "newtab": "index.html"
   },
   "icons": { 
     "16": "logo.png",
-    "48": "logo.png",
+    "48": "logo.png",  
     "128": "logo.png"
+  },
+  "background": {
+    "service_worker": "background.js"
   },
   "host_permissions": ["<all_urls>"]
 } 

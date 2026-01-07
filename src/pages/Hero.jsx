@@ -10,6 +10,14 @@ import BookmarkButton from '../tabs/BookmarkButton'
 import Website from '../tabs/Website'
 import Weather from '../component/Weather'
 import SettingButton from '../tabs/SettingButton'
+import { motion } from 'framer-motion'
+import TodoConfirm from '../component/TodoConfirm'
+
+const ShortCut = ({img})=>{ 
+  return <motion.div className='px-3 py-3 backdrop-blur-sm bg-black/10 rounded-xl overflow-hidden transition duration-100 hover:scale-120 active:scale-80 cursor-pointer'>
+    <img src={img} alt="" className='h-6' />
+  </motion.div>
+}
 
 const Hero = (props) => {
   const contextRef = useRef(null);
@@ -17,7 +25,7 @@ const Hero = (props) => {
   const [contextPos,setContextPos] = useState([0,0]);
   const screenWidth = window.innerWidth;
   const screenHeight = window.innerHeight;
-
+const [showSearchEngine,setShowSearchEngine] = useState(false);
   return (
     <section className='flex flex-col justify-center items-center align-center h-screen w-screen' onContextMenu={e=>{
       e.preventDefault();
@@ -35,8 +43,18 @@ const Hero = (props) => {
     >
         <Time />
         <Wish />
-        <SearchHero notificationRef={props.notificationRef}/>
-        <Quote />
+        <SearchHero notificationRef={props.notificationRef} showSearchEngine={showSearchEngine} setShowSearchEngine={setShowSearchEngine}/>
+        {/* shortcuts */}
+        <section className='flex gap-x-5 mt-5 relative z-[100]'>
+          <ShortCut img="/gmail.webp" />
+          <ShortCut img="/youtube.webp" />
+          <ShortCut img="/linkedin.png" />
+          <ShortCut img="/office.webp" />
+          <ShortCut img="/chatgpt.png" />
+        </section>
+
+        {/* {showSearchEngine && <div onClick={()=>setShowSearchEngine(false)} className="fixed left-0 top-0 bg-black/10 h-screen w-screen z-[1800] backdrop-blur-xs"></div>} */}
+        {/* <Quote /> */}
         <Sparkle />
         <Context contextRef={contextRef} showContext={showContext} setShowContext={setShowContext} position={contextPos} setShowTodo={props.setShowTodo} setShowBookmark={props.setShowBookmark} setShowSetting={props.setShowSetting}/>
         {props.iconsdisplay.weather && <Weather />}

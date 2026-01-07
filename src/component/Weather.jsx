@@ -2,7 +2,13 @@ import React, { useEffect, useState } from "react";
 
 const Weather = () => {
   const [latlon, setlatlon] = useState(() => {
-    return [localStorage.getItem("lat"), localStorage.getItem("lon")];
+    let lat = localStorage.getItem("lat")
+    let lon = localStorage.getItem("lon")
+    if (lat == undefined || lon == undefined) {
+      return ["28.4595", "77.0266"];
+    } else {
+      return [lat, lon];
+    }
   });
   const [weatherData, setWeatherData] = useState({
     place: "",
@@ -11,9 +17,16 @@ const Weather = () => {
   });
   useEffect(() => {
     const fetchData = async () => {
-      const response = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?lat=${latlon[0]}&lon=${latlon[1]}&appid=e85764cbe7283aee72231f16c1ed2600`
-      );
+      var lat = latlon[0];
+      var lon = latlon[1];
+      if (lat == "undefined" || lon == "undefined") {
+        lat = "28.4595"
+        lon = "77.0266"
+      }
+      const url =
+        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=e85764cbe7283aee72231f16c1ed2600`
+
+      const response = await fetch(url);
       const data = await response.json();
       const icon = data["weather"][0]["icon"];
       setWeatherData({
@@ -26,8 +39,8 @@ const Weather = () => {
   }, []);
 
   return (
-    <div className="absolute right-10 top-8 grid grid-cols-2 text-white">
-      <svg
+    <div className="absolute right-10 top-8 grid grid-cols-2 gap-x-2 text-white items-center">
+      {/* <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"
@@ -48,9 +61,10 @@ const Weather = () => {
             d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"
           />
         )}
-      </svg>
-      <h1 className="text-4xl">{weatherData["temp"]}°</h1>
-      <p className="col-span-2 text-center text-lg">{weatherData["place"]}</p>
+      </svg> */}
+      <img src="/weather.png" alt="" className="h-10" />
+      <h1 className="text-2xl self-center">{weatherData["temp"]}°</h1>
+      {/* <p className="col-span-2 text-center text-lg">{weatherData["place"]}</p> */}
     </div>
   );
 };

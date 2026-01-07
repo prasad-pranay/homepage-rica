@@ -52,7 +52,8 @@ body{
   width: 10px;
 }
 .scroll-customize::-webkit-scrollbar-thumb{
-  background-color: gray;
+  background-color: rgba(0, 0, 0, 0.699);
+  border-radius: 4px;
 }
 
 

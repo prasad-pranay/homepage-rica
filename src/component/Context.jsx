@@ -2,7 +2,7 @@ import React from 'react'
 
 const Context = ({contextRef,showContext,position,setShowContext,setShowBookmark,setShowSetting,setShowTodo}) => {
   return (
-    <div className={`z-90 ${showContext?"opacity-100":"opacity-0 z-[-1]"} transition-opacity transition-all duration-300 text-sm w-56 p-4 bg-gray-900 border border-gray-300/30 text-gray-500 rounded-md font-medium absolute`} style={{top:position[1],left:position[0]}} ref={contextRef}>
+    <div className={`z-[1600] ${showContext?"scale-100 translate-x-0 translate-y-0":"scale-0 z-[-1] -translate-x-[50%] -translate-y-[50%]"} transition-transform duration-300 text-sm w-56 p-4 bg-gy-900 backdrop-blur-sm bg-black/30 border border-gray-300/30 text-gray-500 rounded-md font-medium absolute`} style={{top:position[1],left:position[0]}} ref={contextRef}>
     <ul className="flex flex-col gap-2">
         <li className="flex items-center gap-2 hover:bg-gray-700/40 text-gray-300 cursor-pointer px-3 py-2 rounded" onClick={()=>{setShowBookmark(true);setShowContext(false)}}>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-[18px]">

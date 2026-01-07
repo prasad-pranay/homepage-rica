@@ -2,89 +2,26 @@ import React, { useEffect, useState } from "react";
 import Navbar from "./Bookmark/Navbar";
 import Folder from "../reactbit/Folder/Folder";
 import offlineWebImage from "../assets/web.png";
+import { motion } from "framer-motion";
 
-const ToggleView = ({ gridView, setGridView, fullScreen }) => {
-  return (
-    <div
-      className={`flex space-x-2 bg-gray-800 p-1 border border-gray-500/50 rounded-full text-sm fixed ${
-        fullScreen ? "top-[140px] right-[90px]" : "top-[100px] right-[20px]"
-      }`}
-    >
-      <div className="flex items-center" onClick={() => setGridView(true)}>
-        <input
-          type="radio"
-          name="options"
-          id="html"
-          className="hidden peer"
-          checked={gridView}
-        />
-        <label
-          htmlFor="html"
-          className="cursor-pointer rounded-full py-2 px-9 text-gray-500 transition-colors duration-200 peer-checked:bg-indigo-600 peer-checked:text-white"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="1.5"
-            stroke="currentColor"
-            className="size-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"
-            />
-          </svg>
-        </label>
-      </div>
-      <div className="flex items-center" onClick={() => setGridView(false)}>
-        <input
-          type="radio"
-          name="options"
-          id="css"
-          className="hidden peer"
-          checked={!gridView}
-        />
-        <label
-          htmlFor="css"
-          className="cursor-pointer rounded-full py-2 px-9 text-gray-500 transition-colors duration-200 peer-checked:bg-indigo-600 peer-checked:text-white"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="1.5"
-            stroke="currentColor"
-            className="size-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
-            />
-          </svg>
-        </label>
-      </div>
-    </div>
-  );
-};
+
 
 const WebFile = ({ link, title, dateAdded, setContext, id }) => {
-  return (
-    <div
-      id={`bookmark-id-${id}`}
-      className="w-[100px] oveflow-hidden hover:bg-gray-800 transition-bg duration-100 h-max cursor-pointer p-3 rounded"
-      onClick={() => window.open(link)}
-      onContextMenu={(e) => {
-        e.preventDefault();
-        const date = new Date(dateAdded);
+  const date = new Date(dateAdded);
 
         const minutes = date.getMinutes().toString().padStart(2, "0");
         const hours = date.getHours().toString().padStart(2, "0");
         const day = date.getDate();
         const monthName = date.toLocaleString("default", { month: "short" });
         const year = date.getFullYear();
+  return (
+    <motion.div initial={{scale:0,opacity:0}} animate={{scale:1,opacity:1}}
+      id={`bookmark-id-${id}`}
+      className="oveflow-hidden hover:bg-black/20 hover:backdrop-blur-lg transition-bg duration-100 cursor-pointer p-3 rounded"
+      onClick={() => window.open(link)}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        
         // type,title,time,date,url
         setContext([
           "Web Link",
@@ -98,15 +35,19 @@ const WebFile = ({ link, title, dateAdded, setContext, id }) => {
     >
       <img
         src={`https://www.google.com/s2/favicons?domain=${link}`}
-        className="size-10 mb-2"
+        className="h-[15vh] min-h-[50px] w-max mb-2 mx-auto"
         onError={(e) => {
           e.target.onerror = null; // Prevent infinite loop
           e.target.src = offlineWebImage;
         }}
         style={{ height: "50px", borderRadius: "10px" }}
       />
-      <p className="text-white text-xs h-[60px] overflow-hidden">{title}</p>
-    </div>
+      <p className="text-white text-xs overflow-hidden h-[35px] overflow-hidden text-ellipsis">{title}</p>
+      <p className="flex gap-2 items-center text-xs mt-1 text-white"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+</svg>
+<span>{`${day}/${monthName}/${year}`}</span></p>
+    </motion.div>
   );
 };
 
@@ -131,7 +72,7 @@ function getAllBookmarks(data, searchval) {
   return results;
 }
 
-const Bookmark = ({ setShowBookmark, notificationRef }) => {
+const Bookmark = ({ setShowBookmark, notificationRef, showBookmark }) => {
   const [gridView, setGridView] = useState(true);
   const [history, setHistory] = useState([]);
   const [dict, setDict] = useState([{}]);
@@ -430,14 +371,18 @@ const Bookmark = ({ setShowBookmark, notificationRef }) => {
     // id={`bookmark-id-${id}`}
   }
 
-  return (
+  return <>
+    <div onClick={()=>setShowBookmark(false)} className={` fixed top-0 left-0 h-screen w-screen bg-black/1 ${showBookmark ? "scale-100":"scale-0"}`}></div>
+
     <section
       onContextMenu={(e) => e.preventDefault()}
-      className={`fixed bg-gray-900 ${
+      className={`
+        ${showBookmark ? "scale-100 " : "scale-0"} transition duration-300
+        fixed bg-gay-900 bg-black/10 backdrop-blur-lg ${
         fullScreen
           ? "w-[90vw] h-[90vh] ml-[5vw] mt-[5vh] shadow-[0_0_0_80px_rgba(0,0,0,0.6)] border border-gray-700"
           : "w-screen h-screen"
-      } top-0 left-0 z-120`}
+      } top-0 left-0 z-[1500]`}
     >
       {runnable ? (
         <>
@@ -450,19 +395,21 @@ const Bookmark = ({ setShowBookmark, notificationRef }) => {
             setSearch={setSearch}
             search={search}
             searchList={searchList}
+            gridView={gridView}
+            setGridView={setGridView}
           />
           <div
-            className={`flex ${
-              gridView ? "flex-wrap gap-[5vw]" : "flex-col"
+            className={`${
+              gridView ? `grid [grid-template-columns:repeat(auto-fit,minmax(150px,1fr))] gap-5` : "flex flex-col"
             } px-10 py-10 h-[calc(100%-88px)] pt-15 relative overflow-y-scroll scroll-customize`}
           >
-            <ToggleView
+            {/* <ToggleView
               gridView={gridView}
               setGridView={setGridView}
               fullScreen={fullScreen}
-            />
+            /> */}
             {gridView &&
-              dict.map((value, index) => {
+              dict.reverse().map((value, index) => {
                 if (Object.keys(value).length === 0) {
                   return (
                     <p className="text-white text-xl p-2">
@@ -471,18 +418,21 @@ const Bookmark = ({ setShowBookmark, notificationRef }) => {
                   );
                 } else if ("children" in value) {
                   return (
+                    <motion.div initial={{scale:0,opacity:0}} animate={{scale:1,opacity:1}}>
+
                     <Folder
-                      key={index}
+                      key={dict.length - index - 1}
                       size={1}
                       color="#5227FF"
                       className="custom-folder"
                       folderName={value.title}
                       setHistory={setHistory}
-                      index={index}
+                      index={dict.length - index - 1}
                       dateAdded={value.dateAdded}
                       setContext={setContext}
                       id={value.id}
-                    />
+                      />
+                      </motion.div>
                   );
                 } else {
                   return (
@@ -498,14 +448,14 @@ const Bookmark = ({ setShowBookmark, notificationRef }) => {
                 }
               })}
             {!gridView &&
-              dict.map((value, index) => {
+              dict.reverse().map((value, index) => {
                 if ("children" in value) {
                   return (
                     <ListFolder
                       key={index}
                       folderName={value.title}
                       setHistory={setHistory}
-                      index={index}
+                      index={dict.length - index - 1}
                       dateAdded={value.dateAdded}
                       id={value.id}
                     />
@@ -690,7 +640,7 @@ const Bookmark = ({ setShowBookmark, notificationRef }) => {
         </div>
       )}
     </section>
-  );
+  </>;
 };
 
 export default Bookmark;

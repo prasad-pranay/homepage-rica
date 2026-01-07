@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { openDB } from "idb";
+import { AnimatePresence, motion } from "framer-motion";
 const SettingHideButton = ({svgPath,title,val, iconsdisplay, setIconsDisplay})=>{
     return <div className="flex py-2 gap-2 items-center mb-3">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-8">
@@ -11,8 +13,104 @@ const SettingHideButton = ({svgPath,title,val, iconsdisplay, setIconsDisplay})=>
         <span className="dot absolute left-1 top-1 w-5 h-5 bg-white rounded-full transition-transform duration-200 ease-in-out peer-checked:translate-x-5"></span>
     </label>
     </div>
+
 }
-const Setting = ({iconsdisplay,setIconsDisplay,setBackground,setShowSetting, notificationRef}) => {
+
+
+const CitySearch = ({setLatLon}) => {
+  const [query, setQuery] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+
+  // Fetch suggestions from Nominatim
+  const fetchSuggestions = async (cityName) => {
+    if (!cityName) {
+      setSuggestions([]);
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
+          cityName
+        )}&format=json&limit=3`
+      );
+      const data = await response.json();
+
+      // Map results to a simple format
+      const formatted = data.map((item) => ({
+        name: item.display_name,
+        lat: item.lat,
+        lon: item.lon,
+      }));
+
+      setSuggestions(formatted);
+    } catch (error) {
+      console.error("Error fetching suggestions:", error);
+      setSuggestions([]);
+    }
+  };
+
+  const handleChange = (e) => {
+    const value = e.target.value;
+    setQuery(value);
+    fetchSuggestions(value);
+  };
+
+  return (
+    <div className="flex flex-col">
+      <h2 className="text-lg mb-3">Search City</h2>
+      <input
+        type="text"
+        value={query}
+        onChange={handleChange}
+        placeholder="Type a city name..."
+        style={{
+          width: "100%",
+          padding: "10px",
+          borderRadius: "5px",
+          border: "1px solid #ccc",
+          marginBottom: "10px",
+          fontSize: "16px",
+        }}
+      />
+
+      {suggestions.length > 0 && (
+        <ul
+          style={{
+            listStyle: "none",
+            padding: 0,
+            border: "1px solid #ccc",
+            borderRadius: "5px",
+            maxHeight: "200px",
+            overflowY: "auto",
+          }}
+        >
+          {suggestions.map((city, index) => (
+            <li
+              key={index}
+              style={{
+                padding: "10px",
+                borderBottom: index < suggestions.length - 1 ? "1px solid #eee" : "none",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setQuery(city.name);
+                setSuggestions([]);
+                setLatLon([city.lat,city.lon])
+              }}
+            >
+              {city.name}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+};
+
+
+
+const Setting = ({iconsdisplay,setIconsDisplay,setBackground,setShowSetting, notificationRef,showSetting}) => {
   const [name, setName] = useState("");
   const [tab, setTab] = useState(0);
   const [currSearch,setCurrSearch] = useState(-1);
@@ -66,8 +164,62 @@ const Setting = ({iconsdisplay,setIconsDisplay,setBackground,setShowSetting, not
   }, [todoPass])
   
 
+  const [db, setDb] = useState(null);
+  const [images, setImages] = useState([]);
 
+  // 1️⃣ Initialize IndexedDB
+  useEffect(() => {
+    const initDB = async () => {
+      const database = await openDB("ImagesDB", 1, {
+        upgrade(db) {
+          if (!db.objectStoreNames.contains("images")) {
+            db.createObjectStore("images", { keyPath: "id", autoIncrement: true });
+          }
+        },
+      });
+      setDb(database);
+      loadImages(database);
+    };
+    initDB();
+  }, []);
+  // 2️⃣ Load all images from IndexedDB
+  const loadImages = async (database) => {
+    const tx = database.transaction("images", "readonly");
+    const store = tx.objectStore("images");
+    const allImages = await store.getAll();
+    setImages([{ id: -1, image: "/bg2.jpg" },{id: -2, image: "/bg.jpg"},{id: -6, image: "/bg1.jpg"},{id: -3, image: "/bg3.jpg"},{id: -4, image: "/bg3.jpg"},{id: -5, image: "/bg4.jpg"}, ...allImages]);
+  };
+  // 3️⃣ Handle file upload
+  const handleUpload = async (files) => {
+    if (!files.length) return;
+
+    for (let file of files) {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const imageData = e.target.result; // Base64 string
+        const tx = db.transaction("images", "readwrite");
+        const store = tx.objectStore("images");
+        await store.add({ image: imageData, name: file.name }); // save name too
+        await tx.done;
+        loadImages(db); // refresh displayed images
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const deleteImage = async (id) => {
+  if (!db) return; // Make sure DB is initialized
+  const tx = db.transaction("images", "readwrite");
+  const store = tx.objectStore("images");
   
+  await store.delete(id);  // Delete by ID
+  await tx.done;
+
+  // Update state to remove image from UI
+  setImages((prev) => prev.filter((img) => img.id !== id));
+  console.log(`Image with id ${id} deleted`);
+};
+
   
   const dashboardicon = (
     <svg
@@ -163,9 +315,15 @@ const Setting = ({iconsdisplay,setIconsDisplay,setBackground,setShowSetting, not
     // </svg>
   );
 
+  const wallpaperIcon = (<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+</svg>
+)
+
   const sidebarLinks = [
     { name: "Dashboard", icon: dashboardicon },
-    { name: "Engine", icon: searchEngine },
+    { name: "Wallapaper", icon: wallpaperIcon },
+    // { name: "Engine", icon: searchEngine },
     { name: "Widget", icon: hideIcon },
     { name: "Location", icon: locationIcon },
     { name: "Credential", icon: credIcon },
@@ -179,8 +337,13 @@ const Setting = ({iconsdisplay,setIconsDisplay,setBackground,setShowSetting, not
     ["Bing","/bing.png"],
   ]
 
-  return (
-    <section className="fixed bottom-3 left-3 bg-gray-900 z-50">
+  const [currentImageContext,setCurrentImageContext] = useState(null);
+  
+
+  return <>
+  <div onClick={()=>setShowSetting(false)} className={`fixed top-0 left-0 h-screen w-screen bg-black/1 ${showSetting ? "scale-100":"scale-0"}`}></div>
+    <section className={`${showSetting ? "scale-100 translate-x-0 translate-y-0" : "scale-0 -translate-x-[50%] translate-y-[50%]"} transition duration-300 fixed bottom-3 left-3 bg-gay-900 backdrop-blur-sm bg-black/20 z-[1500]`}>
+
       <div className="flex items-center px-4 md:px-8 border-b border-gray-500 py-4 transition-all duration-300">
         <p className="text-indigo-500 font-semibold text-3xl mr-2">Hi, </p>
         <input
@@ -218,15 +381,15 @@ const Setting = ({iconsdisplay,setIconsDisplay,setBackground,setShowSetting, not
             <a
               key={index}
               onClick={() => setTab(index)}
-              className={`flex items-center py-4 px-4 pr-15 gap-3 cursor-pointer border-r-4 
+              className={`flex items-center py-4 px-4 pr-15 gap-3 cursor-pointer border-r-4 transition duration-100 group
                                 ${
                                   index == tab
                                     ? "border-r-4 md:border-r-[6px] bg-indigo-500/10 border-indigo-500 text-indigo-500"
-                                    : "hover:bg-gray-800/90 border-white text-gray-500 border-r-gray-900"
+                                    : "hover:bg-indigo-500/10 border-white text-gray-500 border-r-transparent"
                                 }`}
             >
               {item.icon}
-              <p className="md:block hidden text-center">{item.name}</p>
+              <p className="md:block hidden text-center group-active:scale-85 transition duration-100">{item.name}</p>
             </a>
           ))}
         </div>
@@ -258,21 +421,6 @@ const Setting = ({iconsdisplay,setIconsDisplay,setBackground,setShowSetting, not
             />
           </div>
           <div className="grid grid-cols-[auto_1fr] gap-2">
-            {/* <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-              className="size-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
-                />
-            </svg>
-            <p>Wallpaper</p> */}
             <label
               htmlFor="fileInput"
               className="border rounded-md text-sm w-80 border-indigo-600/60 p-8 flex flex-col col-span-2 items-center gap-4  cursor-pointer hover:border-indigo-500 transition"
@@ -303,6 +451,7 @@ const Setting = ({iconsdisplay,setIconsDisplay,setBackground,setShowSetting, not
                   const url = URL.createObjectURL(file);
                   setBackground(url);
                 }
+                handleUpload(e.target.files)
               }} />
             </label>
             {/* <button className="col-span-2 flex items-center border-2 border-red-600 p-2 justify-center gap-2 text-red-500 cursor-pointer">
@@ -325,6 +474,23 @@ const Setting = ({iconsdisplay,setIconsDisplay,setBackground,setShowSetting, not
           </div>
                   </>}
             {tab==1 && 
+            <div className="grid grid-cols-[1fr_1fr] gap-6 pb-10 h-[100%] py-2">
+
+            {images.map((img) => (
+              <div onContextMenu={(e)=>{e.preventDefault();if(currentImageContext==img.id){setCurrentImageContext(null)}else if(img.id>0){setCurrentImageContext(img.id)}}} key={img.id} onClick={()=>{if(currentImageContext==img.id){setCurrentImageContext(null)}else{setBackground(img.image)}}} className="relative cursor-pointer hover:scale-105 active:scale-95 transition duration-150 h-max">
+            <img src={img.image} className="w-full w-max rounded-sm" />
+                <AnimatePresence>
+            {currentImageContext==img.id && <motion.div onClick={()=>{if(img.id>0){deleteImage(img.id)}}} className="absolute left-0 top-0 flex items-center h-full w-full justify-center bg-black/30 backdrop-blur-xs" initial={{opacity:0,scale:0}} animate={{opacity:1,scale:1}} exit={{opacity:0,scale:0}}>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="size-8 bg-red-600 p-1 rounded-lg stroke-white">
+  <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+</svg>
+
+            </motion.div>}
+            </AnimatePresence>
+          </div>
+        ))}
+            </div>}
+            {/* {tab==2 && 
             <div className="grid grid grid-cols-[1fr_1fr_1fr] gap-6 justify-center items-center h-[100%] py-5">
             {searchEngineList.map((value,index)=>(
                 <button key={index} className="flex flex-col items-center gap-2 relative cursor-pointer" onClick={()=>setCurrSearch(index)}>
@@ -337,14 +503,14 @@ const Setting = ({iconsdisplay,setIconsDisplay,setBackground,setShowSetting, not
                     <p className={`text-xs ${index==currSearch && "text-white"}`}>{value[0]}</p>
                 </button>
             ))}
-            </div>}
+            </div>} */}
             {tab==2 && <div className="py-4">
                 <SettingHideButton iconsdisplay={iconsdisplay} setIconsDisplay={setIconsDisplay} val="weather" title="Weather" svgPath="M2.25 15a4.5 4.5 0 0 0 4.5 4.5H18a3.75 3.75 0 0 0 1.332-7.257 3 3 0 0 0-3.758-3.848 5.25 5.25 0 0 0-10.233 2.33A4.502 4.502 0 0 0 2.25 15Z" />
                 <SettingHideButton iconsdisplay={iconsdisplay} setIconsDisplay={setIconsDisplay} val="bookmark" title="Bookmark" svgPath="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
                 <SettingHideButton iconsdisplay={iconsdisplay} setIconsDisplay={setIconsDisplay} val="todo" title="Todo Button" svgPath="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
                 <SettingHideButton iconsdisplay={iconsdisplay} setIconsDisplay={setIconsDisplay} val="setting" title="Setting Icon" svgPath="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
             </div>}
-            {tab==3 && <div>
+            {/* {tab==3 && <div>
                 <div className="grid grid-cols-[1fr_1fr] gap-y-3 mb-9 gap-x-5 py-8">
                     <p className="flex items-center gap-2 text-base"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
   <path strokeLinecap="round" strokeLinejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498 4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 0 0-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0Z" />
@@ -374,7 +540,8 @@ Search By City Name</p>
 </button>
 </label>
                 </div>
-            </div>}
+            </div>} */}
+            {tab==3 && <CitySearch setLatLon={setLatLon} />}
             {tab==4 && <div>
               <p className="text-xl text-gray-200 mb-2">Todo Password</p>
               <input type="text" placeholder="Enter the password" value={todoPass} onChange={e=>setTodoPass(e.target.value)} className="text-gray-300 text-base outline-none border-b-2 w-[100%] px-2 py-3" />
@@ -382,7 +549,19 @@ Search By City Name</p>
         </div>
       </aside>
     </section>
-  );
+  </>;
 };
 
 export default Setting;
+
+
+
+
+
+
+
+
+
+
+
+

@@ -13,9 +13,9 @@ class Notification extends React.Component {
     };
 
     this.color = {
-      green: "bg-green-900/20 text-green-900",
-      red: "bg-red-600/20 text-red-600",
-      white: "bg-gray-600 text-gray-100",
+      green: "bg-green-900/10 text-green-900",
+      red: "bg-red-600/10 text-red-600",
+      white: "bg-gray-600/10 text-gray-600",
     };
     this.notificationIcon = {
       green: "M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z",
@@ -56,7 +56,7 @@ class Notification extends React.Component {
           this.state.show ? "translate-x-0" : "translate-x-[150%]"
         } ${
           this.state.color
-        } z-500 border-1 border-gray-600 transition-transform duration-500 flex items-center justify-between max-w-80 w-full p-5 py-7 h-10 rounded-sm fixed bottom-10 right-10`}
+        } z-500 border-1 border-gay-600 backdrop-blur-sm transition-transform duration-500 flex items-center justify-between max-w-80 w-full p-5 py-7 h-10 rounded-sm fixed bottom-10 right-10`}
       >
         <div className="flex items-center">
           <svg

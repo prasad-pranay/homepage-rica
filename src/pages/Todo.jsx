@@ -49,7 +49,7 @@ const Todo = ({setShowTodo,notificationRef}) => {
   // localStorage.setItem("todolist","0;:;11:35|21 August;:;My first Todo{-|-}")
 
   return (
-    <section ref={dragRef} className='fixed bottom-2 right-2 backdrop-blur-sm bg-[#101010] min-h-[433px] min-w-[553px] p-5 px-6 rounded-lg z-100 border-2 border-gray-500 overflow-hidden'>
+    <section ref={dragRef} className='fixed bottom-2 right-2 backdrop-blur-sm bg-[#101010] min-h-[433px] min-w-[553px] p-5 px-6 rounded-lg z-[1100] border-2 border-gray-500 overflow-hidden'>
         {showLocked ? <Locked setShowLocked={setShowLocked} /> :
           <>
           <Navbar setShowTodo={setShowTodo} setShowTodoClear={setShowTodoClear} notificationRef={notificationRef} dragRef={dragRef} />
