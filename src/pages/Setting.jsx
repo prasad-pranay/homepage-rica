@@ -56,7 +56,12 @@ const CitySearch = ({setLatLon}) => {
     fetchSuggestions(value);
   };
 
+  const current = localStorage.getItem("city")
+
   return (
+    <section>
+
+   
     <div className="flex flex-col">
       <h2 className="text-lg mb-3">Search City</h2>
       <input
@@ -97,6 +102,7 @@ const CitySearch = ({setLatLon}) => {
                 setQuery(city.name);
                 setSuggestions([]);
                 setLatLon([city.lat,city.lon])
+                localStorage.setItem("city",city.name)
               }}
             >
               {city.name}
@@ -105,6 +111,14 @@ const CitySearch = ({setLatLon}) => {
         </ul>
       )}
     </div>
+
+
+    <div className="mt-5">
+      <h1 className="text-lg">Current Place</h1>
+      <p className="text-sm">{current}</p>
+    </div>
+
+     </section>
   );
 };
 
@@ -187,7 +201,7 @@ const Setting = ({iconsdisplay,setIconsDisplay,setBackground,setShowSetting, not
     const tx = database.transaction("images", "readonly");
     const store = tx.objectStore("images");
     const allImages = await store.getAll();
-    setImages([{ id: -1, image: "/bg2.jpg" },{id: -2, image: "/bg.jpg"},{id: -6, image: "/bg1.jpg"},{id: -3, image: "/bg3.jpg"},{id: -4, image: "/bg3.jpg"},{id: -5, image: "/bg4.jpg"}, ...allImages]);
+    setImages([{ id: -1, image: "/bg2.jpg" },{id: -2, image: "/bg.jpg"},{id: -6, image: "/bg1.jpg"},{id: -3, image: "/bg3.jpg"},{id: -4, image: "/bg5.jpg"},{id: -5, image: "/bg4.jpg"}, ...allImages]);
   };
   // 3️⃣ Handle file upload
   const handleUpload = async (files) => {

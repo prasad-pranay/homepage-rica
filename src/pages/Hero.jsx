@@ -13,8 +13,8 @@ import SettingButton from '../tabs/SettingButton'
 import { motion } from 'framer-motion'
 import TodoConfirm from '../component/TodoConfirm'
 
-const ShortCut = ({img})=>{ 
-  return <motion.div className='px-3 py-3 backdrop-blur-sm bg-black/10 rounded-xl overflow-hidden transition duration-100 hover:scale-120 active:scale-80 cursor-pointer'>
+const ShortCut = ({img,link})=>{ 
+  return <motion.div onClick={()=>window.open(link,"_self")} className='px-3 py-3 backdrop-blur-sm bg-black/10 rounded-xl overflow-hidden transition duration-100 hover:scale-120 active:scale-80 cursor-pointer'>
     <img src={img} alt="" className='h-6' />
   </motion.div>
 }
@@ -46,11 +46,11 @@ const [showSearchEngine,setShowSearchEngine] = useState(false);
         <SearchHero notificationRef={props.notificationRef} showSearchEngine={showSearchEngine} setShowSearchEngine={setShowSearchEngine}/>
         {/* shortcuts */}
         <section className='flex gap-x-5 mt-5 relative z-[100]'>
-          <ShortCut img="/gmail.webp" />
-          <ShortCut img="/youtube.webp" />
-          <ShortCut img="/linkedin.png" />
-          <ShortCut img="/office.webp" />
-          <ShortCut img="/chatgpt.png" />
+          <ShortCut img="/gmail.webp" link="https://mail.google.com/mail/u/0/" />
+          <ShortCut img="/youtube.webp" link="https://www.youtube.com/" />
+          <ShortCut img="/linkedin.png" link="https://www.linkedin.com/" />
+          <ShortCut img="/office.webp" link="https://m365.cloud.microsoft/" />
+          <ShortCut img="/chatgpt.png" link="https://chatgpt.com/" />
         </section>
 
         {/* {showSearchEngine && <div onClick={()=>setShowSearchEngine(false)} className="fixed left-0 top-0 bg-black/10 h-screen w-screen z-[1800] backdrop-blur-xs"></div>} */}
